@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - POS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #3b5998;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            header h1 {
+                margin: 0;
+                font-size: 24px;
+            }
+
+            header nav a {
+                color: #fff;
+                text-decoration: none;
+                margin: 0 10px;
+                font-size: 16px;
+            }
+
+                header nav a:hover {
+                    text-decoration: underline;
+                }
+
+        main {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #3b5998;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .btn {
+            background-color: #3b5998;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background-color: #2d4373;
+            }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/Admin/Index">Pos 2</a>
+        <div class="navbar-nav">
+            <a class="nav-link" asp-controller="Cuenta" asp-action="Logout">Cerrar sesión</a>
+        </div>
+    </nav>
+  
+    <main>
+        @RenderBody()
+    </main>
+    <footer>
+        <p>© 2024 POS - Todos los derechos reservados</p>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

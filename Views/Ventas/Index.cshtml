@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Ventas";
+}
+<div class="layout">
+    <!-- Filtros -->
+    <aside class="filters">
+        <h3>Filtros</h3>
+        <ul>
+            <li><button>Filtro 1</button></li>
+            <li><button>Filtro 2</button></li>
+            <li><button>Filtro 3</button></li>
+        </ul>
+    </aside>
+
+    <!-- Tarjetas -->
+    <section class="grid-cards">
+        <div class="card">
+            <h2>Bienvenido a Ventas</h2>
+            <p>Aquí puedes gestionar las ventas del sistema POS. Explora las opciones disponibles para agregar, editar o revisar ventas existentes.</p>
+            <button class="btn">Crear nueva venta</button>
+        </div>
+        <div class="card">
+            <h3>Resumen del día</h3>
+            <ul>
+                <li>Total de ventas: <strong>$1,200</strong></li>
+                <li>Productos vendidos: <strong>45</strong></li>
+                <li>Clientes atendidos: <strong>30</strong></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Carrito -->
+    <aside class="cart">
+        <h3>Carrito</h3>
+        <ul>
+            <li>Producto 1 - $30</li>
+            <li>Producto 2 - $45</li>
+            <li>Producto 3 - $25</li>
+        </ul>
+        <button class="btn">Finalizar compra</button>
+    </aside>
+</div>
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        background-color: #f4f4f4;
+    }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr; /* Tres columnas */
+        grid-template-rows: auto;
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    /* Estilo para las tarjetas y los contenedores */
+    .card, .filters, .cart {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .filters {
+        background-color: #000;
+        color: #fff;
+        grid-column: 1 / 2;
+    }
+
+    .grid-cards {
+        grid-column: 2 / 3;
+        display: grid;
+        gap: 20px;
+    }
+
+    .cart {
+        grid-column: 3 / 4;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+</style>
