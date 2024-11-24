@@ -20,6 +20,11 @@
                     <input asp-for="Email" class="form-control" type="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
+                <div class="form-group  mb-3">
+                    <label for="DPI">DPI</label>
+                    <input type="text" class="form-control" id="DPI" name="DPI" value="@Model.DPI" required>
+                    <span asp-validation-for="DPI" class="text-danger"></span>
+                </div>
                 <div class="form-group mb-3">
                     <label asp-for="Contrasena" class="form-label">Contraseña</label>
                     <input asp-for="Contrasena" class="form-control" type="password" />

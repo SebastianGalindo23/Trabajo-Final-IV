@@ -10,5 +10,9 @@ namespace POS.Models
 
         [Required]
         public string Rol { get; set; }
+
+        [Required]
+        [StringLength(13, ErrorMessage = "El DPI debe tener 13 dígitos.")]
+        public string? DPI { get; set; }
     }
 }

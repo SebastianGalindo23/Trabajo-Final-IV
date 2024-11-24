@@ -4,123 +4,241 @@ using POS.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace POS.Controllers
 {
     public class EmpleadosController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public EmpleadosController(ApplicationDbContext context)
+        public EmpleadosController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             _context = context;
         }
 
+        // Acción para listar todos los usuarios
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Empleados.ToListAsync());
+            var users = _userManager.Users.ToList();  // Obtiene todos los usuarios
+            return View(users);
         }
 
+        // Acción para ver detalles de un usuario
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null) return NotFound();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
+
+            return View(user);
+        }
+
+        // Acción para crear un nuevo usuario
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nombre,Apellido,DPI,Cargo,Usuario,Contrasena")] Empleado empleado)
+        public async Task<IActionResult> Create(EmpleadoRegisterModel model)
         {
             if (ModelState.IsValid)
             {
-                empleado.Contrasena = BCrypt.Net.BCrypt.HashPassword(empleado.Contrasena);
-                _context.Add(empleado);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var user = new ApplicationUser
+                {
+                    UserName = model.Usuario,
+                    Email = model.Email,
+                    Nombre = model.Nombre,
+                    Rol = model.Rol,
+                    DPI = model.DPI // Asumiendo que tienes el campo DPI en el modelo
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Contrasena);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, model.Rol);
+                    return RedirectToAction("Index");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-            return View(empleado);
+
+            return View(model);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
+                Console.WriteLine("ID no proporcionado.");
                 return NotFound();
             }
-
-            var empleado = await _context.Empleados.FindAsync(id);
-            if (empleado == null)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
+                Console.WriteLine($"Usuario no encontrado con ID: {id}");
                 return NotFound();
             }
-            return View(empleado);
+            // Log para confirmar que se ha encontrado el usuario
+            Console.WriteLine($"Usuario encontrado: {user.UserName}");
+
+            var model = new EmpleadoRegisterModel
+            {
+                Id = user.Id,
+                Usuario = user.UserName,
+                Nombre = user.Nombre,
+                Email = user.Email,
+                Rol = user.Rol,
+                DPI = user.DPI
+            };
+            // Log para confirmar los datos que se están pasando al modelo
+            Console.WriteLine($"Cargando datos para el usuario: {model.Usuario}, {model.Nombre}, {model.Email}, {model.Rol}, {model.DPI}");
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,DPI,Cargo,Usuario,Contrasena")] Empleado empleado)
+        public async Task<IActionResult> Edit(string id, EmpleadoRegisterModel model, string oldPassword, string newPassword, string confirmPassword)
         {
-            if (id != empleado.Id)
+            // Log para verificar el id recibido
+            Console.WriteLine($"ID recibido en POST: {id}");
+            Console.WriteLine($"ID del modelo: {model.Id}");
+
+            if (id != model.Id)
             {
+                // Log si los ids no coinciden
+                Console.WriteLine($"ID no coincide: {id} != {model.Id}");
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
                 {
-                    if (!string.IsNullOrEmpty(empleado.Contrasena))
-                    {
-                        empleado.Contrasena = BCrypt.Net.BCrypt.HashPassword(empleado.Contrasena);
-                    }
-                    _context.Update(empleado);
-                    await _context.SaveChangesAsync();
+                    // Log si el usuario no se encuentra
+                    Console.WriteLine($"Usuario no encontrado al intentar actualizar: {id}");
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+
+                // Log para ver los datos recibidos en el modelo
+                Console.WriteLine($"Actualizando usuario: {model.Usuario}, {model.Nombre}, {model.Email}");
+
+                // Actualizar datos del usuario
+                user.Nombre = model.Nombre;
+                user.UserName = model.Usuario;
+                user.Email = model.Email;
+                user.DPI = model.DPI;
+
+                // Log para confirmar los datos actualizados
+                Console.WriteLine($"Datos actualizados: {user.UserName}, {user.Nombre}, {user.Email}, {user.DPI}");
+
+                // Actualizar rol si aplica
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                if (!string.IsNullOrEmpty(model.Rol))
                 {
-                    if (!EmpleadoExists(empleado.Id))
+                    // Log para confirmar que se está agregando un rol
+                    Console.WriteLine($"Añadiendo rol: {model.Rol}");
+                    await _userManager.AddToRoleAsync(user, model.Rol);
+                }
+
+                // Cambiar contraseña si se proporciona
+                if (!string.IsNullOrEmpty(newPassword))
+                {
+                    if (newPassword != confirmPassword)
                     {
-                        return NotFound();
+                        // Log si las contraseñas no coinciden
+                        Console.WriteLine("Las contraseñas no coinciden.");
+                        ModelState.AddModelError(string.Empty, "Las contraseñas no coinciden.");
+                        return View(model);
                     }
-                    else
+
+                    // Log para intentar cambiar la contraseña
+                    Console.WriteLine($"Intentando cambiar la contraseña para el usuario {user.UserName}");
+                    var changePasswordResult = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+                    if (!changePasswordResult.Succeeded)
                     {
-                        throw;
+                        // Log de errores al cambiar la contraseña
+                        foreach (var error in changePasswordResult.Errors)
+                        {
+                            Console.WriteLine($"Error al cambiar la contraseña: {error.Description}");
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // Guardar cambios en el usuario
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    // Log para confirmar que los cambios fueron guardados
+                    Console.WriteLine("Usuario actualizado exitosamente.");
+                    return RedirectToAction("Index");
+                }
+
+                // Log de errores al guardar los cambios
+                foreach (var error in result.Errors)
+                {
+                    Console.WriteLine($"Error al actualizar el usuario: {error.Description}");
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-            return View(empleado);
+            else
+            {
+                // Log para ver que el modelo no es válido
+                Console.WriteLine("Modelo inválido.");
+            }
+
+            return View(model);
         }
 
-        public async Task<IActionResult> Delete(int? id)
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var empleado = await _context.Empleados
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (empleado == null)
-            {
-                return NotFound();
-            }
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
 
-            return View(empleado);
+            return View(user);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var empleado = await _context.Empleados.FindAsync(id);
-            _context.Empleados.Remove(empleado);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) return NotFound();
 
-        private bool EmpleadoExists(int id)
-        {
-            return _context.Empleados.Any(e => e.Id == id);
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(user);
         }
     }
 }

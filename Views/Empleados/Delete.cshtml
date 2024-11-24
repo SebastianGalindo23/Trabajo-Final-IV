@@ -1,28 +1,19 @@
-﻿@model POS.Models.Empleado
+﻿@model POS.Models.ApplicationUser
 
-<h2>Eliminar Empleado</h2>
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<h1>Eliminar Usuario</h1>
 
 <div>
-    <h4>¿Está seguro de que desea eliminar este empleado?</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Nombre</dt>
-        <dd class="col-sm-10">@Model.Nombre</dd>
+    <h4>@Model.UserName</h4>
+    <p>¿Estás seguro de que deseas eliminar este usuario?</p>
 
-        <dt class="col-sm-2">Apellido</dt>
-        <dd class="col-sm-10">@Model.Apellido</dd>
-
-        <dt class="col-sm-2">DPI</dt>
-        <dd class="col-sm-10">@Model.DPI</dd>
-
-        <dt class="col-sm-2">Cargo</dt>
-        <dd class="col-sm-10">@Model.Cargo</dd>
-    </dl>
-
+    <!-- Formulario para eliminar -->
     <form asp-action="DeleteConfirmed" method="post">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" name="id" value="@Model.Id" />
         <button type="submit" class="btn btn-danger">Eliminar</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        <a href="@Url.Action("Index", "Usuarios")" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-

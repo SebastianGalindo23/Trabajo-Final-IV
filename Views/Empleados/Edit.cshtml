@@ -1,33 +1,48 @@
-﻿@model POS.Models.Empleado
+﻿@model POS.Models.EmpleadoRegisterModel
 
-<h2>Editar Empleado</h2>
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<h1>Editar Usuario</h1>
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+  
     <div class="form-group">
         <label asp-for="Nombre"></label>
         <input asp-for="Nombre" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Apellido"></label>
-        <input asp-for="Apellido" class="form-control" />
+        <label asp-for="Usuario"></label>
+        <input asp-for="Usuario" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Rol"></label>
+        <select asp-for="Rol" class="form-control">
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select>
     </div>
     <div class="form-group">
         <label asp-for="DPI"></label>
         <input asp-for="DPI" class="form-control" />
     </div>
+    <!-- Campos de cambio de contraseña -->
     <div class="form-group">
-        <label asp-for="Cargo"></label>
-        <input asp-for="Cargo" class="form-control" />
+        <label for="oldPassword">Contraseña actual</label>
+        <input type="password" name="oldPassword" id="oldPassword" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Usuario"></label>
-        <input asp-for="Usuario" class="form-control" />
+        <label for="newPassword">Nueva contraseña</label>
+        <input type="password" name="newPassword" id="newPassword" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Contrasena"></label>
-        <input asp-for="Contrasena" type="password" class="form-control" />
+        <label for="confirmPassword">Confirmar nueva contraseña</label>
+        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" />
     </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
 </form>

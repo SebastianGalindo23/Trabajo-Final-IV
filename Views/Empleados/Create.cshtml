@@ -1,6 +1,10 @@
-﻿@model POS.Models.Empleado
+﻿@model POS.Models.EmpleadoRegisterModel
 
-<h2>Crear Empleado</h2>
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+<h1>Crear Usuario</h1>
 
 <form asp-action="Create" method="post">
     <div class="form-group">
@@ -8,25 +12,32 @@
         <input asp-for="Nombre" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Apellido"></label>
-        <input asp-for="Apellido" class="form-control" />
+        <label asp-for="Usuario"></label>
+        <input asp-for="Usuario" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Contrasena"></label>
+        <input asp-for="Contrasena" class="form-control" type="password" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ConfirmarContrasena"></label>
+        <input asp-for="ConfirmarContrasena" class="form-control" type="password" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Rol"></label>
+        <select asp-for="Rol" class="form-control">
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select>
     </div>
     <div class="form-group">
         <label asp-for="DPI"></label>
         <input asp-for="DPI" class="form-control" />
     </div>
-    <div class="form-group">
-        <label asp-for="Cargo"></label>
-        <input asp-for="Cargo" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Usuario"></label>
-        <input asp-for="Usuario" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Contrasena"></label>
-        <input asp-for="Contrasena" type="password" class="form-control" />
-    </div>
+
     <button type="submit" class="btn btn-primary">Crear</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>

@@ -37,6 +37,7 @@ namespace POS.Controllers
                 Email = model.Email,
                 Nombre = model.Nombre,
                 Rol = model.Rol,
+                DPI = model.DPI
             };
 
             var result = await _userManager.CreateAsync(user, model.Contrasena);

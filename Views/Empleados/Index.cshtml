@@ -1,32 +1,40 @@
-﻿@model IEnumerable<POS.Models.Empleado>
+﻿@model IEnumerable<POS.Models.ApplicationUser>
 
-<h2>Lista de Empleados</h2>
-<p>
-    <a asp-action="Create" class="btn btn-primary">Agregar Nuevo Empleado</a>
+@{
+    ViewData["Title"] = "Empleados";
+}
+
+<h1>Empleados</h1>
+
+<p>  
+    <a class="btn btn-success" asp-action="Create"> <i class="bi bi-plus"></i> Crear Nuevo Empleado</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
             <th>Nombre</th>
-            <th>Apellido</th>
-            <th>DPI</th>
-            <th>Cargo</th>
             <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var user in Model)
         {
             <tr>
-                <td>@item.Nombre</td>
-                <td>@item.Apellido</td>
-                <td>@item.DPI</td>
-                <td>@item.Cargo</td>
-                <td>@item.Usuario</td>
+                <td>@user.Nombre</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.Rol</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Eliminar</a>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@user.Id">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@user.Id">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
                 </td>
             </tr>
         }
