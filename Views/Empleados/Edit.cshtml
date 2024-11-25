@@ -1,48 +1,75 @@
-﻿@model POS.Models.EmpleadoRegisterModel
+﻿@model EmpleadoRegisterModel
 
 @{
     ViewData["Title"] = "Editar Usuario";
 }
 
-<h1>Editar Usuario</h1>
+<h2>@ViewData["Title"]</h2>
+
+<!-- Mostrar mensajes de error -->
+@foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+
+{
+    <div class="text-danger">
+        @error.ErrorMessage
+    </div>
+}
 
 <form asp-action="Edit" method="post">
-  
+    @Html.AntiForgeryToken()
+
     <div class="form-group">
-        <label asp-for="Nombre"></label>
+        <label for="Nombre">Nombre</label>
         <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="Usuario"></label>
-        <input asp-for="Usuario" class="form-control" readonly />
+        <label for="Usuario">Usuario</label>
+        <input asp-for="Usuario" class="form-control" />
+        <span asp-validation-for="Usuario" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="Email"></label>
+        <label for="Email">Correo electrónico</label>
         <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="Rol"></label>
+        <label for="Contrasena">Contraseña</label>
+        <input asp-for="Contrasena" class="form-control" type="password" />
+        <span asp-validation-for="Contrasena" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="ConfirmarContrasena">Confirmar Contraseña</label>
+        <input asp-for="ConfirmarContrasena" class="form-control" type="password" />
+        <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Rol">Rol</label>
         <select asp-for="Rol" class="form-control">
             <option value="Admin">Admin</option>
             <option value="User">User</option>
+            <!-- Añadir otros roles según sea necesario -->
         </select>
+        <span asp-validation-for="Rol" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label asp-for="DPI"></label>
+        <label for="DPI">DPI</label>
         <input asp-for="DPI" class="form-control" />
+        <span asp-validation-for="DPI" class="text-danger"></span>
     </div>
-    <!-- Campos de cambio de contraseña -->
+
     <div class="form-group">
-        <label for="oldPassword">Contraseña actual</label>
-        <input type="password" name="oldPassword" id="oldPassword" class="form-control" />
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="@Url.Action("Index", "Empleados")" class="btn btn-secondary">Volver al índice</a>
     </div>
-    <div class="form-group">
-        <label for="newPassword">Nueva contraseña</label>
-        <input type="password" name="newPassword" id="newPassword" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="confirmPassword">Confirmar nueva contraseña</label>
-        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Actualizar</button>
 </form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

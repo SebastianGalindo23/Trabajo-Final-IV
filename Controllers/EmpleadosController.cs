@@ -74,139 +74,101 @@ namespace POS.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
             return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
+            // Verificar que el id no sea nulo
             if (id == null)
             {
-                Console.WriteLine("ID no proporcionado.");
                 return NotFound();
             }
+
+            // Buscar el usuario en la base de datos
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
-                Console.WriteLine($"Usuario no encontrado con ID: {id}");
                 return NotFound();
             }
-            // Log para confirmar que se ha encontrado el usuario
-            Console.WriteLine($"Usuario encontrado: {user.UserName}");
 
+            // Mapear los datos del usuario a la vista
             var model = new EmpleadoRegisterModel
             {
                 Id = user.Id,
                 Usuario = user.UserName,
                 Nombre = user.Nombre,
                 Email = user.Email,
-                Rol = user.Rol,
+                Rol = user.Rol, // Si tienes un campo Rol en el modelo de usuario
                 DPI = user.DPI
             };
-            // Log para confirmar los datos que se están pasando al modelo
-            Console.WriteLine($"Cargando datos para el usuario: {model.Usuario}, {model.Nombre}, {model.Email}, {model.Rol}, {model.DPI}");
 
             return View(model);
         }
 
+        // Acción POST para actualizar un usuario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EmpleadoRegisterModel model, string oldPassword, string newPassword, string confirmPassword)
+        public async Task<IActionResult> Edit(string id, EmpleadoRegisterModel model)
         {
-            // Log para verificar el id recibido
-            Console.WriteLine($"ID recibido en POST: {id}");
-            Console.WriteLine($"ID del modelo: {model.Id}");
-
+            // Verificar que el ID coincida con el que se recibe en el modelo
             if (id != model.Id)
             {
-                // Log si los ids no coinciden
-                Console.WriteLine($"ID no coincide: {id} != {model.Id}");
                 return NotFound();
             }
 
+            // Comprobar que el modelo es válido
             if (ModelState.IsValid)
             {
+                // Buscar el usuario en la base de datos
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                 {
-                    // Log si el usuario no se encuentra
-                    Console.WriteLine($"Usuario no encontrado al intentar actualizar: {id}");
                     return NotFound();
                 }
 
-                // Log para ver los datos recibidos en el modelo
-                Console.WriteLine($"Actualizando usuario: {model.Usuario}, {model.Nombre}, {model.Email}");
-
-                // Actualizar datos del usuario
-                user.Nombre = model.Nombre;
+                // Actualizar las propiedades del usuario
                 user.UserName = model.Usuario;
                 user.Email = model.Email;
+                user.Nombre = model.Nombre;
                 user.DPI = model.DPI;
 
-                // Log para confirmar los datos actualizados
-                Console.WriteLine($"Datos actualizados: {user.UserName}, {user.Nombre}, {user.Email}, {user.DPI}");
-
-                // Actualizar rol si aplica
-                var currentRoles = await _userManager.GetRolesAsync(user);
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
-                if (!string.IsNullOrEmpty(model.Rol))
+                // Si tienes un campo de rol, actualízalo aquí también
+                if (user.Rol != model.Rol)
                 {
-                    // Log para confirmar que se está agregando un rol
-                    Console.WriteLine($"Añadiendo rol: {model.Rol}");
-                    await _userManager.AddToRoleAsync(user, model.Rol);
-                }
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    await _userManager.RemoveFromRolesAsync(user, currentRoles.ToArray());
 
-                // Cambiar contraseña si se proporciona
-                if (!string.IsNullOrEmpty(newPassword))
-                {
-                    if (newPassword != confirmPassword)
+                    if (!string.IsNullOrEmpty(model.Rol))
                     {
-                        // Log si las contraseñas no coinciden
-                        Console.WriteLine("Las contraseñas no coinciden.");
-                        ModelState.AddModelError(string.Empty, "Las contraseñas no coinciden.");
-                        return View(model);
-                    }
-
-                    // Log para intentar cambiar la contraseña
-                    Console.WriteLine($"Intentando cambiar la contraseña para el usuario {user.UserName}");
-                    var changePasswordResult = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-                    if (!changePasswordResult.Succeeded)
-                    {
-                        // Log de errores al cambiar la contraseña
-                        foreach (var error in changePasswordResult.Errors)
-                        {
-                            Console.WriteLine($"Error al cambiar la contraseña: {error.Description}");
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
-                        return View(model);
+                        await _userManager.AddToRoleAsync(user, model.Rol);
                     }
                 }
-                // Guardar cambios en el usuario
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    // Log para confirmar que los cambios fueron guardados
-                    Console.WriteLine("Usuario actualizado exitosamente.");
-                    return RedirectToAction("Index");
-                }
 
-                // Log de errores al guardar los cambios
-                foreach (var error in result.Errors)
+                try
                 {
-                    Console.WriteLine($"Error al actualizar el usuario: {error.Description}");
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    // Guardar los cambios en la base de datos
+                    var result = await _userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("Index");
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
-            }
-            else
-            {
-                // Log para ver que el modelo no es válido
-                Console.WriteLine("Modelo inválido.");
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Error al actualizar el usuario: {ex.Message}");
+                }
             }
 
             return View(model);
         }
+
 
 
         [HttpGet]
