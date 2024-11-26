@@ -9,8 +9,8 @@ namespace POS.Models
 
     public class EmpleadoRegisterModel
     {
-        [Required]
-        public string Id { get; set; }
+        
+        public string? Id { get; set; }
         [Required]
         public string Nombre { get; set; }
 
@@ -22,11 +22,11 @@ namespace POS.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+
         [DataType(DataType.Password)]
         public string Contrasena { get; set; }
 
-        [Required]
+
         [DataType(DataType.Password)]
         [Compare("Contrasena", ErrorMessage = "Las contraseñas no coinciden")]
         public string ConfirmarContrasena { get; set; }

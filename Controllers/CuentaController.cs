@@ -23,8 +23,10 @@ namespace POS.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+
             return View();
         }
+ 
 
         [HttpPost]
         public async Task<IActionResult> Register(EmpleadoRegisterModel model)
@@ -37,21 +39,18 @@ namespace POS.Controllers
                 Email = model.Email,
                 Nombre = model.Nombre,
                 Rol = model.Rol,
-                DPI = model.DPI
+                DPI = model.DPI,
             };
-
             var result = await _userManager.CreateAsync(user, model.Contrasena);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, model.Rol);
                 return RedirectToAction("Login", "Cuenta");
             }
-
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-
             return View(model);
         }
 

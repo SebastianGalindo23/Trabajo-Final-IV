@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using POS.Data; 
+using POS.Data;
 using POS.Models;
 using System.Linq;
 using System.Threading.Tasks;
@@ -76,7 +76,6 @@ namespace POS.Controllers
             }
             return View(model);
         }
-
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
@@ -168,6 +167,7 @@ namespace POS.Controllers
 
             return View(model);
         }
+
 
 
 
